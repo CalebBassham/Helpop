@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class HelpopPlugin : JavaPlugin() {
 
     override fun onEnable() {
-        val helpop = HelpopModule(plugin = this)
+        val helpop = HelpopModule()
         val helpopCmd = helpop.Cmd()
         val helpopAnswerCmd = helpop.AnswerCmd()
 

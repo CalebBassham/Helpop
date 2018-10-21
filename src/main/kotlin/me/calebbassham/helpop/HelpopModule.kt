@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class HelpopModule(val config: Config = HelpopModule.DefaultConfig(), private val plugin: JavaPlugin) : Listener {
+class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) : Listener {
 
     private val id = AtomicInteger(1)
 
