@@ -51,11 +51,17 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
 
         override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
             sender as? Player ?: run {
-                sender.sendMessage("Only players can use this command.")
+                sender.sendMessage("${config.prefix} ${config.messageColor}Only players can use this command.")
                 return true
             }
 
             val message = args.joinToString(" ")
+
+            if (message.isBlank()) {
+                sender.sendMessage("${config.prefix} ${config.messageColor}You can't send a blank helpop.")
+                return true
+            }
+
             val helpop = createHelpop(message, sender)
 
             helpop.send()
