@@ -8,3 +8,6 @@ commands:
   helpop:
     description: Send a message to staff.
     aliases: [ho]
+  answerhelpop:
+    description: Answer a helpop.
+    aliases: [answer, answerho]

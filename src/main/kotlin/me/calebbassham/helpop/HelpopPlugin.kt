@@ -8,8 +8,10 @@ class HelpopPlugin : JavaPlugin() {
     override fun onEnable() {
         val helpop = HelpopModule()
         val helpopCmd = helpop.Cmd()
+        val helpopAnswerCmd = helpop.AnswerCmd()
 
         Bukkit.getPluginCommand("helpop").executor = helpopCmd
+        Bukkit.getPluginCommand("answerhelpop").executor = helpopAnswerCmd
     }
 
 }
