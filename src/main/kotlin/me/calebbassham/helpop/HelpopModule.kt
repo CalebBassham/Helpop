@@ -35,6 +35,7 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
 
         private fun sendQuestionToReceivers() {
             for(receiver in config.receivers) {
+                if (receiver == asker) return
                 receiver.sendMessage("${config.prefix} ${bracket("&6#$id".translateAlternateColorCodes(), config.symbolColor)} ${config.playerNameColor}${asker.displayName}${config.symbolColor}: ${config.messageColor}$message")
             }
         }
