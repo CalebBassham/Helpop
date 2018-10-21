@@ -35,7 +35,7 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
 
         private fun sendToReceivers() {
             for(receiver in config.receivers) {
-                receiver.sendMessage("${config.prefix} ${config.playerNameColor}${sender.displayName}${config.symbolColor}: ${config.messageColor}$message")
+                receiver.sendMessage("${config.prefix} ${bracket("&6#$id".translateAlternateColorCodes(), config.symbolColor)} ${config.playerNameColor}${sender.displayName}${config.symbolColor}: ${config.messageColor}$message")
             }
         }
 
@@ -78,7 +78,7 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
     }
 
     class DefaultConfig : Config {
-        override val prefix = "&8[&6Help-OP&8]".translateAlternateColorCodes()
+        override val prefix = bracket("&6Help-OP", "&8").translateAlternateColorCodes()
         override val messageColor = "&7".translateAlternateColorCodes()
         override val playerNameColor = "&e".translateAlternateColorCodes()
         override val symbolColor = "&8".translateAlternateColorCodes()
