@@ -20,13 +20,11 @@ repositories {
     mavenCentral()
     maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
     maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
-    maven { url = "https://s3.amazonaws.com/caleb-maven" }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compileOnly "org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT"
-    compileOnly "me.calebbassham:ScenarioManager:0.8.0"
 }
 
 compileKotlin {
@@ -38,7 +36,7 @@ compileTestKotlin {
 
 jar {
     from configurations.compile.collect { zipTree it }
-    baseName = "Scenario"
+    baseName = "Helpop"
     archiveName = "${baseName}.${extension}"
 }
 

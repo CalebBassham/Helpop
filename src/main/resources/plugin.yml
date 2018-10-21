@@ -2,4 +2,8 @@ name: Scenario
 description: Description of scenario.
 author: Caleb Bassham
 version: 1.0.0
-main: me.calebbassham.scenariomanager.scenario.ScenarioPlugin
+main: me.calebbassham.helpop.HelpopPlugin
+
+commands:
+  helpop:
+    description: Send a message to staff.
