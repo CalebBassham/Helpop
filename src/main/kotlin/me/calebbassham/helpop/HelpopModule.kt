@@ -30,7 +30,7 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
         }
 
         private fun sendToSender() {
-            sender.sendMessage("${config.prefix} $message")
+            sender.sendMessage("${config.prefix} ${config.messageColor}$message")
         }
 
         private fun sendToReceivers() {
