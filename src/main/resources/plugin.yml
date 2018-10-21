@@ -7,3 +7,4 @@ main: me.calebbassham.helpop.HelpopPlugin
 commands:
   helpop:
     description: Send a message to staff.
+    aliases: [ho]
