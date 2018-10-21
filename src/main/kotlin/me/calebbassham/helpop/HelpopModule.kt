@@ -5,9 +5,14 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
+class HelpopModule(val config: Config = HelpopModule.DefaultConfig(), private val plugin: JavaPlugin) : Listener {
 
     private val id = AtomicInteger(1)
 
@@ -15,14 +20,52 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
 
     fun createHelpop(message: String, sender: Player): Helpop {
         val helpopId = id.getAndIncrement()
-        val helpop = Helpop(helpopId, message, sender)
+        val helpop = Helpop(helpopId, message, sender.uniqueId)
 
         helpops[helpopId] = helpop
 
         return helpop
     }
 
-    inner class Helpop(val id: Int, val message: String, val asker: Player) {
+    @EventHandler
+    fun onPlayerJoin(e: PlayerJoinEvent) {
+
+        val iter = helpops.iterator()
+
+        while (iter.hasNext()) {
+            val helpop = iter.next().value
+
+            if (helpop.asker?.uniqueId != e.player.uniqueId) continue
+
+            helpop.sendAnswerToAsker()
+
+            helpop.delete()
+        }
+
+    }
+
+    inner class Helpop(val id: Int, val message: String, asker: UUID) {
+
+        val askerUniqueId = asker
+
+        val asker: Player?
+            get() = Bukkit.getPlayer(askerUniqueId)
+
+
+        var answer: String? = null
+
+        var answererUniqueId: UUID? = null
+        val answerer: CommandSender?
+            get() {
+                if (answererUniqueId == null) {
+                    if (answer == null) return null
+                    return Bukkit.getConsoleSender()
+                }
+
+                return Bukkit.getPlayer(answererUniqueId)
+            }
+
+        fun isAnswered() = answer != null
 
         fun sendQuestion() {
             sendQuestionToAsker()
@@ -30,13 +73,13 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
         }
 
         private fun sendQuestionToAsker() {
-            asker.sendMessage("${config.prefix} ${config.messageColor}$message")
+            asker?.sendMessage("${config.prefix} ${config.messageColor}$message")
         }
 
         private fun sendQuestionToReceivers() {
-            for(receiver in config.receivers) {
-                if (receiver == asker) return
-                receiver.sendMessage("${config.prefix} ${bracket("&6#$id".translateAlternateColorCodes(), config.symbolColor)} ${config.playerNameColor}${asker.displayName}${config.symbolColor}: ${config.messageColor}$message")
+            for (receiver in config.receivers) {
+                if (receiver == asker) continue
+                receiver.sendMessage("${config.prefix} ${bracket("&6#$id".translateAlternateColorCodes(), config.symbolColor)} ${config.playerNameColor}${asker?.displayName}${config.symbolColor}: ${config.messageColor}$message")
             }
         }
 
@@ -45,30 +88,43 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
         }
 
         fun answer(answer: String, answerer: CommandSender) {
-            sendAnswerToAsker(answer, answerer)
-            sendAnswerToAnswerer(answer, answerer)
-            sendAnswerToReceivers(answer, answerer)
+            this.answer = answer
+            this.answererUniqueId = (answerer as? Player)?.uniqueId
+
+            if (asker?.isOnline == true) {
+                sendAnswerToAsker()
+                delete()
+            }
+
+            sendAnswerToAnswerer()
+            sendAnswerToReceivers()
         }
 
-        private fun sendAnswerToAsker(answer: String, answerer: CommandSender) {
+        fun sendAnswerToAsker() {
             // TODO - Better message format which includes what the question was. Likely multiple lines.
 
-            val answererName = if (answerer is Player) answerer.displayName else answerer.name
-            asker.sendMessage("${config.prefix} ${config.messageColor}$answer ${config.playerNameColor}—$answererName")
+            val answerer = answerer
+
+            val answererName = if (answerer is Player) answerer.displayName else answerer?.name
+            asker?.sendMessage("${config.prefix} ${config.messageColor}$answer ${config.playerNameColor}—$answererName")
         }
 
-        private fun sendAnswerToAnswerer(answer: String, answerer: CommandSender) {
-            val answererName = if (answerer is Player) answerer.displayName else answerer.name
-            answerer.sendMessage("${config.prefix} ${config.messageColor}$answer ${config.playerNameColor}—$answererName")
+        private fun sendAnswerToAnswerer() {
+            val answerer = answerer
+
+            val answererName = if (answerer is Player) answerer.displayName else answerer?.name
+            answerer?.sendMessage("${config.prefix} ${config.messageColor}$answer ${config.playerNameColor}—$answererName")
         }
 
-        private fun sendAnswerToReceivers(answer: String, answerer: CommandSender) {
+        private fun sendAnswerToReceivers() {
             // TODO - Better message format which includes what the question was. Likely multiple lines.
+            val answerer = answerer
 
             for (receiver in config.receivers) {
+                if (receiver == asker) continue
                 if (receiver == answerer) continue
 
-                val answererName = if (answerer is Player) answerer.displayName else answerer.name
+                val answererName = if (answerer is Player) answerer.displayName else answerer?.name
                 receiver.sendMessage("${config.prefix} ${config.messageColor}$answer ${config.playerNameColor}—$answererName")
             }
         }
@@ -129,15 +185,19 @@ class HelpopModule(val config: Config = HelpopModule.DefaultConfig()) {
                 return true
             }
 
+            if (helpop.isAnswered()) {
+                sender.sendMessage("${config.prefix} ${config.messageColor}That helpop has already been answered.")
+                return true
+            }
+
             val answer = args.drop(1).joinToString(" ")
 
             if (answer.isBlank()) {
-                sender.sendMessage("${config.prefix} ${config.messageColor}You can't sendQuestion a blank answer.")
+                sender.sendMessage("${config.prefix} ${config.messageColor}You can't send a blank answer.")
                 return true
             }
 
             helpop.answer(answer, sender)
-            helpop.delete()
 
             return true
         }
