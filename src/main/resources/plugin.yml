@@ -1,5 +1,5 @@
-name: Scenario
-description: Description of scenario.
+name: Helpop
+description: System for players to send messages that can be answered by staff.
 author: Caleb Bassham
 version: 1.0.0
 main: me.calebbassham.helpop.HelpopPlugin
