@@ -9,5 +9,6 @@ commands:
     description: Send a message to staff.
     aliases: [ho]
   answerhelpop:
+    permission: helpop.answer
     description: Answer a helpop.
     aliases: [answer, answerho]
