@@ -12,3 +12,4 @@ commands:
     permission: helpop.answer
     description: Answer a helpop.
     aliases: [answer, answerho]
+    usage: /<command> <id> <response>
