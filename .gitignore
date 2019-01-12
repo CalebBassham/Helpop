@@ -1,3 +1,4 @@
-.gradle
 .idea
-build
+*.iml
+target
+dependency-reduced-pom.xml
